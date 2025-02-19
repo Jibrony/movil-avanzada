@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, Text, View, Button, Image, ScrollView, Switch, TextInput } from 'react-native';
+import { StatusBar, StyleSheet, Text, View, ScrollView, TextInput } from 'react-native';
+import Checkbox from 'expo-checkbox';
 
 export default function App() {
   const [pokemonList, setPokemonList] = useState([]); // Lista completa de Pokémon
@@ -35,8 +36,7 @@ export default function App() {
     }
   };
 
-  // Función para manejar el cambio en los switches
-  const handleToggle = (pokemonName) => {
+  const handleCheckboxToggle = (pokemonName) => {
     setSelectedPokemon({
       ...selectedPokemon,
       [pokemonName]: !selectedPokemon[pokemonName],
@@ -61,9 +61,10 @@ export default function App() {
       <ScrollView style={styles.pokemonList}>
         {filteredPokemonList.map((pokemon, index) => (
           <View key={index} style={styles.checkboxContainer}>
-            <Switch
-              value={selectedPokemon[pokemon.name] || false}
-              onValueChange={() => handleToggle(pokemon.name)}
+            <Checkbox
+              value={selectedPokemon[pokemon.name] || false} // Estado del checkbox
+              onValueChange={() => handleCheckboxToggle(pokemon.name)} // Manejador de cambios
+              color={selectedPokemon[pokemon.name] ? '#4630EB' : undefined} // Color cuando está seleccionado
             />
             <Text style={styles.label}>{pokemon.name}</Text>
           </View>
@@ -79,18 +80,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    justifyContent: 'center', // Centra verticalmente el contenido
-    alignItems: 'center', // Centra horizontalmente el contenido
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   h1: {
     fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 20, // Espacio inferior
-    textAlign: 'center', // Centra el texto
+    marginBottom: 20,
+    textAlign: 'center',
   },
   searchContainer: {
-    width: '80%', // Ancho del contenedor del buscador
-    marginBottom: 20, // Espacio inferior
+    width: '80%',
+    marginBottom: 20,
   },
   searchInput: {
     height: 40,
@@ -98,19 +99,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    textAlign: 'center', // Centra el texto dentro del input
+    textAlign: 'center',
   },
   pokemonList: {
-    width: '80%', // Ancho de la lista de Pokémon
+    width: '80%',
   },
   checkboxContainer: {
     flexDirection: 'row',
-    alignItems: 'center', // Centra verticalmente los elementos
-    justifyContent: 'space-between', // Espacio entre el Switch y el texto
-    marginBottom: 10, // Espacio inferior entre cada Pokémon
+    alignItems: 'center',
+    marginBottom: 10,
   },
   label: {
     fontSize: 16,
-    marginLeft: 10, // Espacio entre el Switch y el texto
+    marginLeft: 10,
   },
 });
