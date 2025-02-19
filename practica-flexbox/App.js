@@ -1,28 +1,74 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StatusBar, StyleSheet, Text, View, Button, Image, ScrollView, Switch, TextInput } from 'react-native';
 
 export default function App() {
+  const [pokemonList, setPokemonList] = useState([]); // Lista completa de Pokémon
+  const [filteredPokemonList, setFilteredPokemonList] = useState([]); // Lista filtrada de Pokémon
+  const [selectedPokemon, setSelectedPokemon] = useState({}); // Pokémon seleccionados
+  const [searchText, setSearchText] = useState(''); // Texto del buscador
+
+  // Obtener la lista de Pokémon de la API
+  useEffect(() => {
+    fetch('https://pokeapi.co/api/v2/pokemon?limit=20')
+      .then(response => response.json())
+      .then(data => {
+        setPokemonList(data.results);
+        setFilteredPokemonList(data.results); // Inicialmente, la lista filtrada es igual a la lista completa
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+  }, []);
+
+  // Función para manejar el cambio en el buscador
+  const handleSearch = (text) => {
+    setSearchText(text); // Actualizar el texto del buscador
+    if (text) {
+      // Filtrar la lista de Pokémon que coincidan con el texto
+      const filtered = pokemonList.filter(pokemon =>
+        pokemon.name.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredPokemonList(filtered);
+    } else {
+      // Si el texto está vacío, mostrar la lista completa
+      setFilteredPokemonList(pokemonList);
+    }
+  };
+
+  // Función para manejar el cambio en los switches
+  const handleToggle = (pokemonName) => {
+    setSelectedPokemon({
+      ...selectedPokemon,
+      [pokemonName]: !selectedPokemon[pokemonName],
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.h1}>Flexbox</Text>
 
-      <Image
-        source={require('./assets/cheems.png')}
-        style={styles.image}
-      />
-
-
-      <Text style={styles.h2}>Andrey Arce</Text>
-      <Text style={styles.h3}>Trikitrakatelas</Text>
-
-      <View style={styles.buttonContainer}>
-        <View style={styles.btn1}>
-          <Button title="Button 1" onPress={() => alert('Button 1 presionado')} />
-        </View>
-        <View style={styles.btn2}>
-          <Button title="Button 2" onPress={() => alert('Button 2 presionado')} />
-        </View>
+      {/* Buscador */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar Pokémon..."
+          value={searchText}
+          onChangeText={handleSearch}
+        />
       </View>
+
+      {/* Lista de Pokémon */}
+      <ScrollView style={styles.pokemonList}>
+        {filteredPokemonList.map((pokemon, index) => (
+          <View key={index} style={styles.checkboxContainer}>
+            <Switch
+              value={selectedPokemon[pokemon.name] || false}
+              onValueChange={() => handleToggle(pokemon.name)}
+            />
+            <Text style={styles.label}>{pokemon.name}</Text>
+          </View>
+        ))}
+      </ScrollView>
 
       <StatusBar style="auto" />
     </View>
@@ -33,49 +79,38 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'center', // Centra verticalmente el contenido
+    alignItems: 'center', // Centra horizontalmente el contenido
   },
   h1: {
     fontSize: 32,
     fontWeight: 'bold',
-    top: 100,
-    left: 130,
-    marginBottom: 50,
+    marginBottom: 20, // Espacio inferior
+    textAlign: 'center', // Centra el texto
   },
-  h2: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 10,
-    top: 100,
-    left: 125,
+  searchContainer: {
+    width: '80%', // Ancho del contenedor del buscador
+    marginBottom: 20, // Espacio inferior
   },
-  h3: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    top: 150,
-    left: 135,
+  searchInput: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    textAlign: 'center', // Centra el texto dentro del input
   },
-  image: {
-    width: 150,
-    height: 150,
-    top: 100,
-    left: 150,
-    marginBottom: 20,
+  pokemonList: {
+    width: '80%', // Ancho de la lista de Pokémon
   },
-  buttonContainer: {
+  checkboxContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '60%',
-    marginTop: 20,
-    top: 200,
-    left: 80,
+    alignItems: 'center', // Centra verticalmente los elementos
+    justifyContent: 'space-between', // Espacio entre el Switch y el texto
+    marginBottom: 10, // Espacio inferior entre cada Pokémon
   },
-  btn1: {
-    color: 'white',
-    backgroundColor: '#1251ac',
-  },
-  btn2: {
-    color: 'white',
-    backgroundColor: '#FF0000',
+  label: {
+    fontSize: 16,
+    marginLeft: 10, // Espacio entre el Switch y el texto
   },
 });
-
