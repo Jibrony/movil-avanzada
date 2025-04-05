@@ -1,26 +1,41 @@
-import { View, Text, FlatList } from 'react-native';
-import { Link } from 'expo-router';
-
-// Datos de ejemplo (luego vendrán de una API)
-const places = [
-  { id: '1', name: 'Casa de Luna', description: 'Patio grande y zona de juegos' },
-  { id: '2', name: 'Guardería Peludos', description: 'Atención 24/7 con veterinario' },
-];
+import { View, FlatList, Text } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
+import { mockPlaces } from '../../data/mockPlaces';
 
 export default function HomeScreen() {
+  const { text, background, cardBackground, border } = useTheme();
+
   return (
-    <View style={{ flex: 1, padding: 10 }}>
-      <Text style={{ fontSize: 20, marginBottom: 10 }}>Lugares disponibles</Text>
+    <View style={{ flex: 1, backgroundColor: background, padding: 16 }}>
+      <Text style={{ 
+        fontSize: 24, 
+        fontWeight: 'bold', 
+        color: text,
+        marginBottom: 16 
+      }}>
+        Lugares disponibles
+      </Text>
+
       <FlatList
-        data={places}
+        data={mockPlaces}
         renderItem={({ item }) => (
-          <Link href={`/place/${item.id}`} asChild>
-            <View style={{ padding: 15, borderBottomWidth: 1, borderColor: '#ccc' }}>
-              <Text style={{ fontWeight: 'bold' }}>{item.name}</Text>
-              <Text>{item.description}</Text>
-            </View>
-          </Link>
+          <View style={{
+            backgroundColor: cardBackground,
+            borderRadius: 12,
+            padding: 16,
+            marginBottom: 12,
+            borderWidth: 1,
+            borderColor: border
+          }}>
+            <Text style={{ color: text, fontWeight: 'bold', fontSize: 18 }}>
+              {item.name}
+            </Text>
+            <Text style={{ color: text, opacity: 0.8, marginTop: 4 }}>
+              {item.description}
+            </Text>
+          </View>
         )}
+        keyExtractor={item => item.id}
       />
     </View>
   );
